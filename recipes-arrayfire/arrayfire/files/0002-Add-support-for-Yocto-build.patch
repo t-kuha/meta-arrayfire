@@ -1,0 +1,58 @@
+From 0657533fef07aff3f0bf05869245ad172a3d8c00 Mon Sep 17 00:00:00 2001
+From: t-kuha <imagingtechnerd@gmail.com>
+Date: Mon, 27 Oct 2025 13:35:48 +0000
+Subject: [PATCH] Add support for Yocto build
+
+---
+ CMakeLists.txt | 35 -----------------------------------
+ 1 file changed, 35 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 21bc48d39..366bcba57 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -333,41 +333,6 @@ af_dep_check_and_populate(${assets_prefix}
+ )
+ set(ASSETS_DIR ${${assets_prefix}_SOURCE_DIR})
+ 
+-# when crosscompiling use the bin2cpp file from the native bin directory
+-if(CMAKE_CROSSCOMPILING)
+-  set(NATIVE_BIN_DIR "NATIVE_BIN_DIR-NOTFOUND"
+-    CACHE FILEPATH "Path to the Native build directory.")
+-  if(NATIVE_BIN_DIR)
+-    include(${NATIVE_BIN_DIR}/ImportExecutables.cmake)
+-  else()
+-    message(SEND_ERROR "Native Directory not found. Run cmake in a separate"
+-                       "directory and build the bin2cpp target.")
+-  endif()
+-else()
+-  add_executable(bin2cpp CMakeModules/bin2cpp.cpp
+-                         src/backend/common/deterministicHash.cpp
+-                         src/backend/common/deterministicHash.hpp
+-                         src/backend/common/Source.hpp)
+-  set_target_properties(bin2cpp
+-    PROPERTIES
+-      CXX_STANDARD 17)
+-  target_link_libraries(bin2cpp PRIVATE nonstd::span-lite)
+-
+-  if(WIN32)
+-    target_compile_definitions(bin2cpp PRIVATE OS_WIN)
+-  elseif(APPLE)
+-    target_compile_definitions(bin2cpp PRIVATE OS_MAC)
+-  elseif(UNIX)
+-    target_compile_definitions(bin2cpp PRIVATE OS_LNX)
+-  endif()
+-  target_include_directories(bin2cpp PRIVATE
+-                             ${ArrayFire_SOURCE_DIR}/include
+-                             ${ArrayFire_BINARY_DIR}/include
+-                             ${ArrayFire_SOURCE_DIR}/src/backend)
+-  export(TARGETS bin2cpp FILE ${CMAKE_BINARY_DIR}/ImportExecutables.cmake)
+-endif()
+-
+-
+ if(NOT LAPACK_FOUND)
+     if(APPLE)
+         # UNSET THE VARIABLES FROM LAPACKE
+-- 
+2.34.1
+
